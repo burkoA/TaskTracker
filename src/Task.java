@@ -1,18 +1,31 @@
+import java.io.Serializable;
 import java.sql.Time;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
-public class Task {
+public class Task implements Serializable {
+    private static int lastId;
     private int id;
     private String description;
     private StatusEnum status;
-    private Time createdAt;
-    private Time updatedAt;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 
-    public Task(int id, String description, StatusEnum status, Time createdAt, Time updatedAt) {
-        this.id = id;
+    public Task(String description) {
+        this.id = ++lastId;
         this.description = description;
-        this.status = status;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
+        this.status = StatusEnum.TODO;
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    public String formatToJson() {
+        return "{" +
+                "\"id\"" + ":" + "\"" + this.id + "\"" + "," +
+                "\"description\"" + ":" + "\"" + this.description + "\"" + "," +
+                "\"status\"" + ":" + "\"" + status.toString() + "\"" + "," +
+                "\"createdAt\"" + ":" + "\"" + this.createdAt + "\"" + "," +
+                "\"updatedAt\"" + ":" + "\"" + this.updatedAt + "\"" + "}" + ",";
     }
 
     // Getters
@@ -29,11 +42,11 @@ public class Task {
         return status;
     }
 
-    public Time getCreatedAt() {
+    public LocalDateTime getCreatedAt() {
         return createdAt;
     }
 
-    public Time getUpdatedAt() {
+    public LocalDateTime getUpdatedAt() {
         return updatedAt;
     }
 
@@ -51,11 +64,11 @@ public class Task {
         this.status = status;
     }
 
-    public void setCreatedAt(Time createdAt) {
+    public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
 
-    public void setUpdatedAt(Time updatedAt) {
+    public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
     }
 }

@@ -1,6 +1,11 @@
 ### IntelliJ IDEA ###
 .idea/
 out/
+src/TaskTracker.class
+src/TaskCommands.class
+src/StatusEnum.class
+src/Task.class
+src/taskManagerList.json
 !**/src/main/**/out/
 !**/src/test/**/out/
 
