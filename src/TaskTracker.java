@@ -10,7 +10,6 @@ public class TaskTracker {
         if(!Files.exists(Path.of(FILE_NAME))){
             try {
                 Files.createFile(Path.of(FILE_NAME));
-                Files.writeString(Path.of(FILE_NAME),"[\n"+"]");
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -35,6 +34,11 @@ public class TaskTracker {
                 taskCommands.addTask(args[1]);
                 break;
             case "update":
+                if(args.length < 3 || args[2].isBlank()) {
+                    System.out.println("Error! Correct syntax - TaskTracker update <task_id> <newDescription>");
+                    return;
+                }
+                //taskCommands.updateTask(Integer.parseInt(args[1]));
                 break;
             case "delete":
                 break;

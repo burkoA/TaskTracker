@@ -1,25 +1,24 @@
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class TaskCommands {
 
     final static String FILE_NAME = "taskManagerList.json";
     final Path path = Path.of(FILE_NAME);
+    List<String> tasksList = getAllTask();
     Task task;
 
     public void addTask(String description) {
-        if(description.contains("\"")){
-            description = removeQuotes(description);
-        }
-
-        task = new Task(description);
-        int maxValue = getMaxValue();
-        task.setId(maxValue);
-        String fileText = allTextWithoutLastBracket() + task.formatToJson() + "\n" + "]";
-
         try {
-            Files.write(path, fileText.getBytes());
+            task = new Task(description);
+            task.setId(getMaxId());
+            tasksList.add(task.formatToJson());
+            Files.write(path,loadToFile().getBytes());
             System.out.println("Task added successfully (ID: " + task.getId() + ")");
         } catch (IOException e) {
             System.out.println(e.toString());
@@ -38,58 +37,95 @@ public class TaskCommands {
                 + "9. list in-progress \n");
     }
 
-    private String removeQuotes(String text) {
-        return text.replace("\"","");
-    }
+    private List<Task> formatJson() {
+        List<Task> taskList = new ArrayList<>();
+        Task newTask = new Task();
 
-    private String allTextWithoutLastBracket() {
-        try {
-            return Files.readString(path).replace("]","");
-        } catch (IOException e) {
-            System.out.println(e.toString());
+        for(String task : tasksList) {
+            String[] prepared = task.replace("\"","")
+                    .replace("{","")
+                    .split(",");
+
+            newTask.setId(Integer.parseInt(prepared[0].split(":")[1]));
+            newTask.setDescription(prepared[1].split(":")[1]);
+
+            if(StatusEnum.DONE.toString().equals(prepared[2].split(":")[1]))
+                newTask.setStatus(StatusEnum.DONE);
+
+            if(StatusEnum.TODO.toString().equals(prepared[2].split(":")[1]))
+                newTask.setStatus(StatusEnum.TODO);
+
+            if(StatusEnum.IN_PROGRESS.toString().equals(prepared[2].split(":")[1]))
+                newTask.setStatus(StatusEnum.IN_PROGRESS);
+
+            newTask.setCreatedAt(LocalDateTime.parse(prepared[3].split(":",2)[1]));
+
+            if(prepared[4].contains("}")) {
+                newTask.setUpdatedAt(LocalDateTime.parse(prepared[4]
+                        .replace("}","")
+                        .split(":",2)[1]));
+            } else {
+            newTask.setUpdatedAt(LocalDateTime.parse(prepared[4].split(":",2)[1]));
+            }
+
+            taskList.add(newTask);
         }
-
-        return "";
-    }
-
-    private String[] jsonFormatter() {
-        String text = allTextWithoutLastBracket();
-
-        if(text.replace("[","").isBlank()) {
-            return new String[0];
-        }
-
-        String[] taskList = text.replace("[","")
-                .replace("]","")
-                .replace("\n","")
-                .replace("\"","")
-                .split("},");
 
         return taskList;
     }
 
-    private int getMaxValue() {
-        String[] value = jsonFormatter();
+    private int getMaxId() {
+        List<Task> taskList = formatJson();
+        int maxValue = -1;
 
-        if(value.length == 0)
-            return 0;
+        for(Task task : taskList) {
+            maxValue = Math.max(maxValue, task.getId());
+        }
 
-        int id = -1;
+        return  maxValue + 1;
+    }
 
-        for(String task : value) {
-            task = task.replace("{", "").replace("}", "");
-            String[] parts = task.split(",");
+    private List<String> getAllTask() {
+        try {
+            String taskString = Files.readString(path);
 
-            for(String part : parts) {
-                int parseValue;
-                if (part.trim().startsWith("id:")) {
-                    parseValue = Integer.parseInt(part.split(":")[1].trim());
-                    id = Math.max(parseValue,id);
-                    break;
+            if(taskString.replace("[","")
+                    .replace("]","").isBlank()) {
+                return new ArrayList<>();
+            }
+
+            String[] taskArr =  taskString.replace("[","")
+                    .replace("]","")
+                    .replace("\n","")
+                    .split("},");
+
+            return new ArrayList<>(Arrays.stream(taskArr).toList());
+        } catch (IOException e) {
+            System.out.println(e.toString());
+        }
+
+        return new ArrayList<>();
+    }
+
+    private String loadToFile() {
+        StringBuilder task = new StringBuilder();
+        task.append("[\n");
+
+        for(int i = 0; i < tasksList.size(); i++) {
+
+            if(i < tasksList.size() - 1) {
+                if (!tasksList.get(i).contains("}")) {
+                    task.append(tasksList.get(i)).append("}").append(",").append("\n");
+                } else {
+                    task.append(tasksList.get(i)).append(",").append("\n");
                 }
+            }
+            else {
+                task.append(tasksList.get(i));
             }
         }
 
-        return id+1;
+        task.append("\n]");
+        return task.toString();
     }
 }

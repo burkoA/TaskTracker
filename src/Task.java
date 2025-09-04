@@ -4,15 +4,16 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 public class Task implements Serializable {
-    private static int lastId;
     private int id;
     private String description;
     private StatusEnum status;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
+    public Task() {
+    }
+
     public Task(String description) {
-        this.id = ++lastId;
         this.description = description;
         this.status = StatusEnum.TODO;
         this.createdAt = LocalDateTime.now();
@@ -25,7 +26,7 @@ public class Task implements Serializable {
                 "\"description\"" + ":" + "\"" + this.description + "\"" + "," +
                 "\"status\"" + ":" + "\"" + status.toString() + "\"" + "," +
                 "\"createdAt\"" + ":" + "\"" + this.createdAt + "\"" + "," +
-                "\"updatedAt\"" + ":" + "\"" + this.updatedAt + "\"" + "}" + ",";
+                "\"updatedAt\"" + ":" + "\"" + this.updatedAt + "\"" + "}";
     }
 
     // Getters
