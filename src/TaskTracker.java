@@ -1,6 +1,7 @@
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.text.ParseException;
 
 public class TaskTracker {
 
@@ -38,7 +39,11 @@ public class TaskTracker {
                     System.out.println("Error! Correct syntax - TaskTracker update <task_id> <newDescription>");
                     return;
                 }
-                //taskCommands.updateTask(Integer.parseInt(args[1]));
+                try {
+                    taskCommands.updateTask(Integer.parseInt(args[1]), args[2]);
+                } catch (NumberFormatException e) {
+                    System.out.println("Error! Second argument must be a number!");
+                }
                 break;
             case "delete":
                 break;

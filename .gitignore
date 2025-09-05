@@ -6,6 +6,7 @@ src/TaskCommands.class
 src/StatusEnum.class
 src/Task.class
 src/taskManagerList.json
+src/TaskNotFound.class
 !**/src/main/**/out/
 !**/src/test/**/out/
 

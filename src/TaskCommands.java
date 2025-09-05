@@ -13,6 +13,8 @@ public class TaskCommands {
     List<String> tasksList = getAllTask();
     Task task;
 
+    // Public Operations
+
     public void addTask(String description) {
         try {
             task = new Task(description);
@@ -20,6 +22,18 @@ public class TaskCommands {
             tasksList.add(task.formatToJson());
             Files.write(path,loadToFile().getBytes());
             System.out.println("Task added successfully (ID: " + task.getId() + ")");
+        } catch (IOException e) {
+            System.out.println(e.toString());
+        }
+    }
+
+    public void updateTask(int taskId, String taskDescription) {
+        task = getTaskById(taskId);
+        task.setDescription(taskDescription);
+        task.setUpdatedAt(LocalDateTime.now());
+        tasksList.set(taskId,task.formatToJson());
+        try {
+            Files.write(path, loadToFile().getBytes());
         } catch (IOException e) {
             System.out.println(e.toString());
         }
@@ -37,11 +51,35 @@ public class TaskCommands {
                 + "9. list in-progress \n");
     }
 
-    private List<Task> formatJson() {
+    // Methods for main functionality
+
+    private int getMaxId() {
+        List<Task> taskList = formatJsonToTaskObject();
+        int maxValue = -1;
+
+        for(Task task : taskList) {
+            maxValue = Math.max(maxValue, task.getId());
+        }
+
+        return  maxValue + 1;
+    }
+
+    private Task getTaskById(int taskId) {
+        List<Task> taskList = formatJsonToTaskObject();
+
+        return taskList.stream()
+                .filter(task -> task.getId() == taskId)
+                .findFirst()
+                .orElseThrow(() -> new TaskNotFound("Wrong task id!"));
+    }
+
+    // Methods for reading tasks
+
+    private List<Task> formatJsonToTaskObject() {
         List<Task> taskList = new ArrayList<>();
-        Task newTask = new Task();
 
         for(String task : tasksList) {
+            Task newTask = new Task();
             String[] prepared = task.replace("\"","")
                     .replace("{","")
                     .split(",");
@@ -72,17 +110,6 @@ public class TaskCommands {
         }
 
         return taskList;
-    }
-
-    private int getMaxId() {
-        List<Task> taskList = formatJson();
-        int maxValue = -1;
-
-        for(Task task : taskList) {
-            maxValue = Math.max(maxValue, task.getId());
-        }
-
-        return  maxValue + 1;
     }
 
     private List<String> getAllTask() {
