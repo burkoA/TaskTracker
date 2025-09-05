@@ -46,6 +46,15 @@ public class TaskTracker {
                 }
                 break;
             case "delete":
+                if(args.length < 2){
+                    System.out.println("Error! Correct syntax - TaskTracker delete <taskID>");
+                    return;
+                }
+                try {
+                    taskCommands.deleteTask(Integer.parseInt(args[1]));
+                } catch (NumberFormatException e) {
+                    System.out.println("Error! Second argument must be a number!");
+                }
                 break;
             case "mark-in-progress":
                 break;

@@ -10,33 +10,38 @@ public class TaskCommands {
 
     final static String FILE_NAME = "taskManagerList.json";
     final Path path = Path.of(FILE_NAME);
-    List<String> tasksList = getAllTask();
-    Task task;
+    private final List<String> tasksList = getAllTask();
 
     // Public Operations
 
     public void addTask(String description) {
-        try {
-            task = new Task(description);
-            task.setId(getMaxId());
-            tasksList.add(task.formatToJson());
-            Files.write(path,loadToFile().getBytes());
-            System.out.println("Task added successfully (ID: " + task.getId() + ")");
-        } catch (IOException e) {
-            System.out.println(e.toString());
-        }
+        Task task = new Task(description);
+        task.setId(getMaxId());
+        tasksList.add(task.formatToJson());
+
+        writeFile();
+        System.out.println("Task added successfully (ID: " + task.getId() + ")");
     }
 
     public void updateTask(int taskId, String taskDescription) {
-        task = getTaskById(taskId);
-        task.setDescription(taskDescription);
-        task.setUpdatedAt(LocalDateTime.now());
-        tasksList.set(taskId,task.formatToJson());
-        try {
-            Files.write(path, loadToFile().getBytes());
-        } catch (IOException e) {
-            System.out.println(e.toString());
+        List<Task> taskList = formatJsonToTaskObject();
+
+        for(Task task : taskList) {
+            if(task.getId() != taskId)
+                continue;
+
+            task.setDescription(taskDescription);
+            task.setUpdatedAt(LocalDateTime.now());
+            break;
         }
+
+        convertTaskToString(taskList);
+        writeFile();
+    }
+
+    public void deleteTask(int taskId) {
+        tasksList.remove(taskId);
+        writeFile();
     }
 
     public void wrongCommand() {
@@ -62,15 +67,6 @@ public class TaskCommands {
         }
 
         return  maxValue + 1;
-    }
-
-    private Task getTaskById(int taskId) {
-        List<Task> taskList = formatJsonToTaskObject();
-
-        return taskList.stream()
-                .filter(task -> task.getId() == taskId)
-                .findFirst()
-                .orElseThrow(() -> new TaskNotFound("Wrong task id!"));
     }
 
     // Methods for reading tasks
@@ -110,6 +106,14 @@ public class TaskCommands {
         }
 
         return taskList;
+    }
+
+    private void convertTaskToString(List<Task> taskList) {
+        tasksList.clear();
+
+        for(Task task : taskList) {
+            tasksList.add(task.formatToJson());
+        }
     }
 
     private List<String> getAllTask() {
@@ -154,5 +158,13 @@ public class TaskCommands {
 
         task.append("\n]");
         return task.toString();
+    }
+
+    private void writeFile() {
+        try {
+            Files.write(path, loadToFile().getBytes());
+        } catch (IOException e) {
+            System.out.println(e.toString());
+        }
     }
 }
