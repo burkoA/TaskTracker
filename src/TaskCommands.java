@@ -10,23 +10,20 @@ public class TaskCommands {
 
     final static String FILE_NAME = "taskManagerList.json";
     final Path path = Path.of(FILE_NAME);
-    private final List<String> tasksList = getAllTask();
+    private final List<String> tasksStringList = getAllTask();
+    private final List<Task> tasksObjectList = formatJsonToTaskObject();
 
     // Public Operations
 
     public void addTask(String description) {
         Task task = new Task(description);
         task.setId(getMaxId());
-        tasksList.add(task.formatToJson());
-
-        writeFile();
+        tasksStringList.add(task.formatToJson());
         System.out.println("Task added successfully (ID: " + task.getId() + ")");
     }
 
     public void updateTask(int taskId, String taskDescription) {
-        List<Task> taskList = formatJsonToTaskObject();
-
-        for(Task task : taskList) {
+        for(Task task : tasksObjectList) {
             if(task.getId() != taskId)
                 continue;
 
@@ -35,13 +32,37 @@ public class TaskCommands {
             break;
         }
 
-        convertTaskToString(taskList);
-        writeFile();
+        convertTaskToString(tasksObjectList);
+    }
+
+    public void markInProgress(int taskId) {
+        for(Task task : tasksObjectList) {
+            if(task.getId() != taskId)
+                continue;
+
+            task.changeStatusToInProgress();
+            break;
+        }
+
+        convertTaskToString(tasksObjectList);
+    }
+
+    public void markDone(int taskId) {
+        for(Task task : tasksObjectList) {
+            if(task.getId() != taskId)
+                continue;
+
+            task.changeStatusToDone();
+            break;
+        }
+
+        convertTaskToString(tasksObjectList);
     }
 
     public void deleteTask(int taskId) {
-        tasksList.remove(taskId);
-        writeFile();
+        convertTaskToString(tasksObjectList.stream()
+                .filter(task -> task.getId() != taskId)
+                .toList());
     }
 
     public void wrongCommand() {
@@ -74,7 +95,7 @@ public class TaskCommands {
     private List<Task> formatJsonToTaskObject() {
         List<Task> taskList = new ArrayList<>();
 
-        for(String task : tasksList) {
+        for(String task : tasksStringList) {
             Task newTask = new Task();
             String[] prepared = task.replace("\"","")
                     .replace("{","")
@@ -83,13 +104,13 @@ public class TaskCommands {
             newTask.setId(Integer.parseInt(prepared[0].split(":")[1]));
             newTask.setDescription(prepared[1].split(":")[1]);
 
-            if(StatusEnum.DONE.toString().equals(prepared[2].split(":")[1]))
+            if(StatusEnum.DONE.getTaskStatus().equals(prepared[2].split(":")[1]))
                 newTask.setStatus(StatusEnum.DONE);
 
-            if(StatusEnum.TODO.toString().equals(prepared[2].split(":")[1]))
+            if(StatusEnum.TODO.getTaskStatus().equals(prepared[2].split(":")[1]))
                 newTask.setStatus(StatusEnum.TODO);
 
-            if(StatusEnum.IN_PROGRESS.toString().equals(prepared[2].split(":")[1]))
+            if(StatusEnum.IN_PROGRESS.getTaskStatus().equals(prepared[2].split(":")[1]))
                 newTask.setStatus(StatusEnum.IN_PROGRESS);
 
             newTask.setCreatedAt(LocalDateTime.parse(prepared[3].split(":",2)[1]));
@@ -109,10 +130,10 @@ public class TaskCommands {
     }
 
     private void convertTaskToString(List<Task> taskList) {
-        tasksList.clear();
+        tasksStringList.clear();
 
         for(Task task : taskList) {
-            tasksList.add(task.formatToJson());
+            tasksStringList.add(task.formatToJson());
         }
     }
 
@@ -142,17 +163,17 @@ public class TaskCommands {
         StringBuilder task = new StringBuilder();
         task.append("[\n");
 
-        for(int i = 0; i < tasksList.size(); i++) {
+        for(int i = 0; i < tasksStringList.size(); i++) {
 
-            if(i < tasksList.size() - 1) {
-                if (!tasksList.get(i).contains("}")) {
-                    task.append(tasksList.get(i)).append("}").append(",").append("\n");
+            if(i < tasksStringList.size() - 1) {
+                if (!tasksStringList.get(i).contains("}")) {
+                    task.append(tasksStringList.get(i)).append("}").append(",").append("\n");
                 } else {
-                    task.append(tasksList.get(i)).append(",").append("\n");
+                    task.append(tasksStringList.get(i)).append(",").append("\n");
                 }
             }
             else {
-                task.append(tasksList.get(i));
+                task.append(tasksStringList.get(i));
             }
         }
 
@@ -160,7 +181,7 @@ public class TaskCommands {
         return task.toString();
     }
 
-    private void writeFile() {
+    public void writeFile() {
         try {
             Files.write(path, loadToFile().getBytes());
         } catch (IOException e) {

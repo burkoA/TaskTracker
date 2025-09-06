@@ -11,6 +11,6 @@ public enum StatusEnum {
     }
 
     public String getTaskStatus(){
-        return  this.getTaskStatus();
+        return  this.taskStatus;
     }
 }

@@ -24,9 +24,17 @@ public class Task implements Serializable {
         return "{" +
                 "\"id\"" + ":" + "\"" + this.id + "\"" + "," +
                 "\"description\"" + ":" + "\"" + this.description + "\"" + "," +
-                "\"status\"" + ":" + "\"" + status.toString() + "\"" + "," +
+                "\"status\"" + ":" + "\"" + status.getTaskStatus() + "\"" + "," +
                 "\"createdAt\"" + ":" + "\"" + this.createdAt + "\"" + "," +
                 "\"updatedAt\"" + ":" + "\"" + this.updatedAt + "\"" + "}";
+    }
+
+    public void changeStatusToInProgress() {
+        this.status = StatusEnum.IN_PROGRESS;
+    }
+
+    public void changeStatusToDone() {
+        this.status = StatusEnum.DONE;
     }
 
     // Getters

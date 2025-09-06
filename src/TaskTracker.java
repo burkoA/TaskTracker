@@ -53,12 +53,30 @@ public class TaskTracker {
                 try {
                     taskCommands.deleteTask(Integer.parseInt(args[1]));
                 } catch (NumberFormatException e) {
-                    System.out.println("Error! Second argument must be a number!");
+                    System.out.println("Error! First argument must be a number!");
                 }
                 break;
             case "mark-in-progress":
+                if(args.length < 2){
+                    System.out.println("Error! Correct syntax - TaskTracker mark-in-progress <taskID>");
+                    return;
+                }
+                try {
+                    taskCommands.markInProgress(Integer.parseInt(args[1]));
+                } catch (NumberFormatException e) {
+                    System.out.println("Error! First argument must be a number!");
+                }
                 break;
             case "mark-done":
+                if(args.length < 2){
+                    System.out.println("Error! Correct syntax - TaskTracker mark-done <taskID>");
+                    return;
+                }
+                try {
+                    taskCommands.markDone(Integer.parseInt(args[1]));
+                } catch (NumberFormatException e) {
+                    System.out.println("Error! First argument must be a number!");
+                }
                 break;
             case "list":
                 break;
@@ -71,5 +89,6 @@ public class TaskTracker {
             default:
                 taskCommands.wrongCommand();
         }
+        taskCommands.writeFile();
     }
 }
