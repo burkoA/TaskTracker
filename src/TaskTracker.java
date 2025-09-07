@@ -1,7 +1,6 @@
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.text.ParseException;
 
 public class TaskTracker {
 
@@ -79,12 +78,16 @@ public class TaskTracker {
                 }
                 break;
             case "list":
-                break;
-            case "list done":
-                break;
-            case "list todo":
-                break;
-            case "list in-progress":
+                if(args.length < 2) {
+                    taskCommands.listAllTask();
+                } else {
+                    switch (args[1]) {
+                        case "done" -> taskCommands.listDoneTask();
+                        case "todo" -> taskCommands.listToDoTask();
+                        case "in-progress" -> taskCommands.listInProgressTask();
+                        default -> taskCommands.wrongCommand();
+                    }
+                }
                 break;
             default:
                 taskCommands.wrongCommand();

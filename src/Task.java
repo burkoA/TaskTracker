@@ -1,9 +1,6 @@
-import java.io.Serializable;
-import java.sql.Time;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
-public class Task implements Serializable {
+public class Task{
     private int id;
     private String description;
     private StatusEnum status;
@@ -29,12 +26,13 @@ public class Task implements Serializable {
                 "\"updatedAt\"" + ":" + "\"" + this.updatedAt + "\"" + "}";
     }
 
-    public void changeStatusToInProgress() {
-        this.status = StatusEnum.IN_PROGRESS;
-    }
-
-    public void changeStatusToDone() {
-        this.status = StatusEnum.DONE;
+    @Override
+    public String toString(){
+        return "[Id" + ":" + this.id + ", " +
+                "Description" + ":" + this.description + ", " +
+                "Status" + ":" + status.getTaskStatus() + ", " +
+                "Created at" + ":" + this.createdAt + ", " +
+                "Updated at" + ":" + this.updatedAt +" ]";
     }
 
     // Getters

@@ -40,7 +40,7 @@ public class TaskCommands {
             if(task.getId() != taskId)
                 continue;
 
-            task.changeStatusToInProgress();
+            task.setStatus(StatusEnum.IN_PROGRESS);
             break;
         }
 
@@ -52,7 +52,7 @@ public class TaskCommands {
             if(task.getId() != taskId)
                 continue;
 
-            task.changeStatusToDone();
+            task.setStatus(StatusEnum.DONE);
             break;
         }
 
@@ -77,17 +77,52 @@ public class TaskCommands {
                 + "9. list in-progress \n");
     }
 
+    public void listAllTask(){
+        tasksObjectList.forEach(System.out::println);
+    }
+
+    public void listDoneTask() {
+        List<Task> tasksDone = tasksObjectList.stream()
+                .filter(task -> task.getStatus().getTaskStatus().equals(StatusEnum.DONE.getTaskStatus()))
+                .toList();
+
+        printListedTask(tasksDone);
+    }
+
+    public void listToDoTask() {
+        List<Task> tasksToDo = tasksObjectList.stream()
+                .filter(task -> task.getStatus().getTaskStatus().equals(StatusEnum.TODO.getTaskStatus()))
+                .toList();
+
+        printListedTask(tasksToDo);
+    }
+
+    public void listInProgressTask() {
+        List<Task> tasksInProgress = tasksObjectList.stream()
+                .filter(task -> task.getStatus().getTaskStatus().equals(StatusEnum.IN_PROGRESS.getTaskStatus()))
+                .toList();
+
+        printListedTask(tasksInProgress);
+    }
+
     // Methods for main functionality
 
     private int getMaxId() {
-        List<Task> taskList = formatJsonToTaskObject();
         int maxValue = -1;
 
-        for(Task task : taskList) {
+        for(Task task : tasksObjectList) {
             maxValue = Math.max(maxValue, task.getId());
         }
 
         return  maxValue + 1;
+    }
+
+    public void printListedTask(List<Task> tasks) {
+        if(tasks.isEmpty()){
+            System.out.println("There is no task with this status :(");
+        } else {
+            tasks.forEach(System.out::println);
+        }
     }
 
     // Methods for reading tasks

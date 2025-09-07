@@ -1,6 +1,6 @@
 [
 {"id":"1","description":"Buy some food!","status":"done","createdAt":"2025-09-06T19:35:18.862420700","updatedAt":"2025-09-06T19:44:28.013740100"},
-{"id":"2","description":"update task desc","status":"todo","createdAt":"2025-09-06T19:35:20.033304800","updatedAt":"2025-09-06T19:37:46.338893400"},
+{"id":"2","description":"update task desc","status":"in-progress","createdAt":"2025-09-06T19:35:20.033304800","updatedAt":"2025-09-06T19:37:46.338893400"},
 {"id":"5","description":"Hello World","status":"done","createdAt":"2025-09-06T19:35:25.191238600","updatedAt":"2025-09-06T19:38:33.333730800"},
 {"id":"6","description":"Check add fucntion","status":"todo","createdAt":"2025-09-06T19:35:27.177523200","updatedAt":"2025-09-06T19:35:27.177523200"}
 ]
